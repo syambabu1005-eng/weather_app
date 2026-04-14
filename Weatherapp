@@ -1,0 +1,118 @@
+
+# Weather App Without API Key
+import requests
+
+#  Get Weather Function
+def get_weather(city):
+    
+    try:
+        url = f"https://wttr.in/{city}?format=j1"
+        response = requests.get(url, timeout=5)
+
+        if response.status_code != 200:
+            print("❌ Failed to fetch data")
+            return
+
+        data = response.json()
+
+        current = data.get("current_condition", [])[0]
+
+        temp = current.get("temp_C", "N/A")
+        humidity = current.get("humidity", "N/A")
+        wind = current.get("windspeedKmph", "N/A")
+        condition = current.get("weatherDesc", [{}])[0].get("value", "N/A")
+        feels = current.get("FeelsLikeC", "N/A")
+
+        print("\n==============================")
+        print("🌦️ WEATHER REPORT")
+        print("==============================")
+        print("📍 City:", city)
+        print("🌡️ Temperature:", temp, "°C")
+        print("🤒 Feels Like:", feels, "°C")
+        print("💧 Humidity:", humidity, "%")
+        print("🌪️ Wind Speed:", wind, "km/h")
+        print("☁️ Condition:", condition)
+        print("==============================")
+
+    except requests.exceptions.RequestException:
+        print("❌ Network error. Check your internet connection.")
+    except Exception as e:
+        print("❌ Error:", e)
+
+
+# ==============================
+# 📅 Forecast Function
+# ==============================
+def forecast(city):
+    
+    try:
+        url = f"https://wttr.in/{city}?format=j1"
+        response = requests.get(url, timeout=5)
+
+        if response.status_code != 200:
+            print("❌ Failed to fetch forecast")
+            return
+
+        data = response.json()
+
+        print("\n📅 3 Day Forecast\n")
+
+        for day in data.get("weather", [])[:3]:
+            date = day.get("date", "N/A")
+            avgtemp = day.get("avgtempC", "N/A")
+            condition = day.get("hourly", [{}])[0].get("weatherDesc", [{}])[0].get("value", "N/A")
+
+            print("📆 Date:", date)
+            print("🌡️ Avg Temp:", avgtemp, "°C")
+            print("☁️ Condition:", condition)
+            print("---------------------------")
+
+    except requests.exceptions.RequestException:
+        print("❌ Network error. Check your internet connection.")
+    except Exception as e:
+        print("❌ Forecast error:", e)
+
+
+# ==============================
+# 🔄 Main App
+# ==============================
+def weather_app():
+
+    print("===================================")
+    print("🌦️ WEATHER APPLICATION (NO API KEY)")
+    print("===================================")
+
+    while True:
+
+        print("\n1. Current Weather")
+        print("2. 3 Day Forecast")
+        print("3. Exit")
+
+        choice = input("\nEnter your choice: ").strip()
+
+        if choice == "1":
+            city = input("Enter city name: ").strip()
+            if city:
+                get_weather(city)
+            else:
+                print("❌ City name cannot be empty")
+
+        elif choice == "2":
+            city = input("Enter city name: ").strip()
+            if city:
+                forecast(city)
+            else:
+                print("❌ City name cannot be empty")
+
+        elif choice == "3":
+            print("\n👋 Exiting Weather App")
+            break
+
+        else:
+            print("❌ Invalid choice")
+
+
+# ==============================
+# ▶️ Run
+# ==============================
+weather_app()
